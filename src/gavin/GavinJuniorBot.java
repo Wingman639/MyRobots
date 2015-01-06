@@ -119,24 +119,24 @@ public class GavinJuniorBot extends AdvancedRobot {
 	public double toAngle(double x, double y, double fieldWidth, double fieldHeight){
 		double angle = 0;
 		if (x > fieldWidth/2 && y > fieldHeight/2) {
-            angle = 135;
-        } else if (x > fieldWidth/2 && y < fieldHeight/2) {
             angle = 225;
-        } else if (x < fieldWidth/2 && y < fieldHeight/2) {
+        } else if (x > fieldWidth/2 && y < fieldHeight/2) {
             angle = 315;
-        } else if (x < fieldWidth/2 && y > fieldHeight/2) {
+        } else if (x < fieldWidth/2 && y < fieldHeight/2) {
             angle = 45;
+        } else if (x < fieldWidth/2 && y > fieldHeight/2) {
+            angle = 135;
         } 
         return angle;
 	}
 	
 	public double getRunAngle(){
-		double runAngle = getHeading() - toAngle(getX(), getY(), getBattleFieldWidth(), getBattleFieldHeight());
+		double runAngle = toAngle(getX(), getY(), getBattleFieldWidth(), getBattleFieldHeight()) - getHeading();
 		return minTurnAngle(runAngle);
 	}
 	
 	public double getBackAngle(){
-		double runAngle = getHeading() - toAngle(getX(), getY(), getBattleFieldWidth(), getBattleFieldHeight());
+		double runAngle = toAngle(getX(), getY(), getBattleFieldWidth(), getBattleFieldHeight()) - getHeading();
 		return runAngle;
 	}
 	
