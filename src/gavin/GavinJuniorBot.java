@@ -23,7 +23,7 @@ public class GavinJuniorBot extends AdvancedRobot {
 			turnRight( runAngle / 2 );
 			setTurnRight( runAngle / 2 );
 			setAhead(200);
-			setTurnGunRight(45);
+			setTurnGunRight(180);
 			//scan();
 		}
 	}
@@ -51,7 +51,7 @@ public class GavinJuniorBot extends AdvancedRobot {
         */
 		double gunTurnAmt = normalRelativeAngleDegrees(e.getBearing() + (getHeading() - getRadarHeading()));
 		turnGunRight(gunTurnAmt);
-		fire(3);
+		fire(1);
 		//scan();
 	}
 
@@ -81,8 +81,10 @@ public class GavinJuniorBot extends AdvancedRobot {
 	public void onHitRobot(HitRobotEvent e) {
 		stop();
         if (isEnemy(e)) {
-            double angle = minTurnAngle(getGunAngleToTurn(e.getBearing()));
-            turnGunLeft( angle );
+            //double angle = minTurnAngle(getGunAngleToTurn(e.getBearing()));
+            //turnGunLeft( angle );
+        	double gunTurnAmt = normalRelativeAngleDegrees(e.getBearing() + getHeading());
+    		turnGunRight(gunTurnAmt);
             fire(5);
         } 
         setTurnRight(-90);
