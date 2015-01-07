@@ -143,4 +143,17 @@ public class GavinJuniorBot extends AdvancedRobot {
 	public boolean isEnemy(HitRobotEvent e) {
 		return true;
 	}
+	
+	public void targetPoint(ScannedRobotEvent e) {
+		double bearing = (getHeading() + e.getBearing()) % 360; 
+		double distance = e.getDistance(); 
+		bearing = Math.toRadians(bearing); 
+	
+		double genyX = getX() + Math.sin(bearing) * distance;
+		double genyY = getY() + Math.cos(bearing) * distance;
+		
+		out.println("genyX:"+ Math.round(genyX));
+		out.println("genyY:"+ Math.round(genyY));
+		// need structure point (x, y) to return
+	}
 }
