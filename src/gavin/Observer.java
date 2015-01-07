@@ -28,6 +28,7 @@ public class Observer extends AdvancedRobot {
 	        enemy.update(e,this); 
 	    double Offset = rectify( enemy.direction - getRadarHeadingRadians() ); 
 	    setTurnRadarRightRadians( Offset * 1.5); 
+	    turnGunToRadar();
 	}
 	//角度修正方法，重要
 	public double rectify ( double angle ) 
@@ -61,5 +62,10 @@ public class Observer extends AdvancedRobot {
 	            x = me.getX() + Math.sin( direction ) * distance; 
 	            y= me.getY() + Math.cos( direction ) * distance; 
 	    }
+	}
+	
+	public void turnGunToRadar() {
+		double offset = rectify(getRadarHeadingRadians() - getGunHeadingRadians());
+		setTurnGunRightRadians(offset);
 	}
 }
