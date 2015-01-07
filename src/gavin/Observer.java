@@ -10,7 +10,7 @@ public class Observer extends AdvancedRobot {
     { 
        setAdjustGunForRobotTurn( true ); 
        setAdjustRadarForGunTurn( true ); 
-       this.setColors(Color.red, Color.blue, Color.yellow, Color.black, Color.green);
+       this.setColors(Color.red, Color.blue, Color.yellow, Color.red, Color.green);
     
             while(true){
                     if(enemy.name == null){
@@ -29,6 +29,7 @@ public class Observer extends AdvancedRobot {
 	    double Offset = rectify( enemy.direction - getRadarHeadingRadians() ); 
 	    setTurnRadarRightRadians( Offset * 1.5); 
 	    turnGunToRadar();
+	    fire(1);
 	}
 	//角度修正方法，重要
 	public double rectify ( double angle ) 
