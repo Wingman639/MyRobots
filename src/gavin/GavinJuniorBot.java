@@ -4,18 +4,15 @@ import robocode.AdvancedRobot;
 import robocode.ScannedRobotEvent;
 import robocode.HitRobotEvent;
 import static robocode.util.Utils.normalRelativeAngleDegrees;
+import java.awt.Color;
 
 public class GavinJuniorBot extends AdvancedRobot {
 
-	/**
-	 * run: TestFirstJuniorRobot's default behavior
-	 */
+
 	public void run() {
 		// Initialization of the robot should be put here
-
-		// Some color codes: blue, yellow, black, white, red, pink, brown, grey, orange...
-		// Sets these colors (robot parts): body, gun, radar, bullet, scan_arc
-		
+		setRadarColor(new Color(200, 200, 70));
+		setScanColor(Color.blue);
 
 		// Robot main loop
 		while(true) {
@@ -26,6 +23,8 @@ public class GavinJuniorBot extends AdvancedRobot {
 			turnRight( runAngle / 2 );
 			setTurnRight( runAngle / 2 );
 			setAhead(200);
+			setTurnGunRight(45);
+			//scan();
 		}
 	}
 
@@ -53,7 +52,7 @@ public class GavinJuniorBot extends AdvancedRobot {
 		double gunTurnAmt = normalRelativeAngleDegrees(e.getBearing() + (getHeading() - getRadarHeading()));
 		turnGunRight(gunTurnAmt);
 		fire(3);
-		scan();
+		//scan();
 	}
 
 	/**
