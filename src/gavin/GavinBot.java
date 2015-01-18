@@ -12,7 +12,7 @@ public class GavinBot extends AdvancedRobot
 	Target target = new Target();
 	
 	public class Target {
-		public int saveCount = 20;
+		public int saveCount = 15;
 		public long timeStamp = 0;
 		public double bearing = 0;
 		public double[] bearingRing = new double[saveCount]; 
