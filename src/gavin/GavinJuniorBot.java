@@ -30,48 +30,22 @@ public class GavinJuniorBot extends AdvancedRobot {
         }
 	}
 
-	/**
-	 * onScannedRobot: What to do when you see another robot
-	 */
+
 	public void onScannedRobot(ScannedRobotEvent e) {
     	target.update(e, this);
     	lockRadarOnTarget();
     	fireToNextTargetPosition( guessPoint() );
 	}
 
-	/**
-	 * onHitByBullet: What to do when you're hit by a bullet
-	 */
-	public void onHitByBullet() {
-		// Replace the next line with any behavior you would like
-		//back(10);
-	}
-	
-	/**
-	 * onHitWall: What to do when you hit a wall
-	 */
+
 	public void onHitWall() {
-		// Replace the next line with any behavior you would like
-		out.println("hit wall, heading " + getHeading());
 		stop();
 		back(50);
-		/*
-		back(100);
-		turnRight( getBackAngle() );
-		ahead(100);
-		*/
+
 	}	
 	
 	public void onHitRobot(HitRobotEvent e) {
 		stop();
-		/*
-        if (isEnemy(e)) {
-            //double angle = minTurnAngle(getGunAngleToTurn(e.getBearing()));
-            //turnGunLeft( angle );
-        	double gunTurnAmt = normalRelativeAngleDegrees(getGunHeading() - (getHeading() - e.getBearing()) );
-    		turnGunRight(gunTurnAmt);
-            fire(5);
-        } */
         setTurnRight(-90);
         setBack(20);
 	}
