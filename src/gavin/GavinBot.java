@@ -1,6 +1,7 @@
 package gavin;
 
 import java.awt.Color;
+import java.awt.geom.Point2D;
 
 import robocode.AdvancedRobot;
 import robocode.ScannedRobotEvent;
@@ -8,29 +9,28 @@ import robocode.ScannedRobotEvent;
 
 public class GavinBot extends AdvancedRobot
 {
-	long interval = 5;
+	int firepower = 1;
 	Target target = new Target();
 	
 	public class Target {
-		public int saveCount = 15;
 		public long timeStamp = 0;
 		public double bearing = 0;
-		public double[] bearingRing = new double[saveCount]; 
-		public double absoluteDirectionRadains = 0;
-		public double offsetRadains = 0;
+		public double velocity = 0;
+		public double distance = 0;
+		public double heading = 0;
+		public double direction = 0;
+		public double x = 0, y = 0;
+		public Point2D.Double p = new Point2D.Double(0, 0);
 		
 		public void update( ScannedRobotEvent e, AdvancedRobot me) {
 			timeStamp = me.getTime();
 			bearing = e.getBearingRadians();
-			absoluteDirectionRadains = bearing + me.getHeadingRadians();
-			calcuateNextBearing( me );
-		}
-		
-		public void calcuateNextBearing( AdvancedRobot me ) {
-			int index = (int) (timeStamp % saveCount);
-			bearingRing[index] = bearing;
-			int prePositionIndex = (index + 1) % saveCount;
-			offsetRadains = bearing - bearingRing[prePositionIndex];
+			velocity = e.getVelocity();
+			distance = e.getDistance();
+			heading = e.getHeadingRadians();
+			direction = bearing + me.getHeadingRadians();
+			x = me.getX() + Math.sin( direction ) * distance; 
+            y= me.getY() + Math.cos( direction ) * distance; 
 		}
 	}
 
@@ -52,19 +52,18 @@ public class GavinBot extends AdvancedRobot
     {
     	target.update(e, this);
     	lockRadarOnTarget();
-    	fireToNextTargetPosition();
+    	fireToNextTargetPosition(new Point2D.Double(target.x, target.y));
     }
     
     public void lockRadarOnTarget() {
-    	double angleDiff = minAngleRadians(target.absoluteDirectionRadains - getRadarHeadingRadians());
+    	double angleDiff = minAngleRadians(target.direction - getRadarHeadingRadians());
     	setTurnRadarRightRadians( angleDiff * 1.5 );
     }
     
-    public void fireToNextTargetPosition() {
-    	double angleDiff = minAngleRadians(target.absoluteDirectionRadains + target.offsetRadains - getGunHeadingRadians());
-    	setTurnGunRightRadians( angleDiff );
-    	setFire(1);
-    	out.printf("(%f, %f)", getRadarHeadingRadians(), getGunHeadingRadians());
+    public void fireToNextTargetPosition( Point2D.Double p) {
+    	double offset = getGunHeadingRadians() - (Math.PI/2 - Math.atan2(p.y -getY(), p.x - getX()));
+    	setTurnGunLeftRadians( minAngleRadians(offset) );
+    	setFire(firepower);
     }
     
     public double minAngleRadians( double angle ) {
@@ -78,5 +77,13 @@ public class GavinBot extends AdvancedRobot
     
     public long timePassed( long oldTime ) {
     	return getTime() - oldTime;
+    }
+    
+    public double bulletFlyDurationTime( double distance ) {
+    	return distance / (20 -(3 * firepower));
+    }
+    
+    public double targetMovingLength() {
+    	return target.velocity * bulletFlyDurationTime( target.distance );
     }
 }
