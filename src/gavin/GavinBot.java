@@ -10,12 +10,14 @@ public class GavinBot extends AdvancedRobot
 	Target target = new Target();
 	
 	public class Target {
-		public ScannedRobotEvent e = null;
+		public long timeStamp = 0;
+		public double bearing = 0;
 		public double absoluteDirectionRadains = 0;
 		
-		public void update( ScannedRobotEvent inE, AdvancedRobot me) {
-			e = inE;
-			absoluteDirectionRadains = e.getBearingRadians() + me.getHeadingRadians();
+		public void update( ScannedRobotEvent e, AdvancedRobot me) {
+			bearing = e.getBearingRadians();
+			absoluteDirectionRadains = bearing + me.getHeadingRadians();
+			timeStamp = me.getTime();
 		}
 	}
 
@@ -26,13 +28,10 @@ public class GavinBot extends AdvancedRobot
         this.setColors(Color.blue, Color.black, Color.white, Color.blue, Color.cyan);
         
         while (true) {
-        	if (target.e == null) {
-        		setTurnRadarRight(360);
-        		execute();
+        	if ( timePassed(target.timeStamp) > 5 ) {
+        		setTurnRadarRight(360); 
         	}
-        	else {
-        		execute();
-        	}
+        	execute();
         }
     } 
 
@@ -48,15 +47,15 @@ public class GavinBot extends AdvancedRobot
     }
     
     public double minAngleRadians( double angle ) {
-    	if (angle > 2 * Math.PI) {
-    		angle = angle % (2 * Math.PI);
-    	}
-    	if (angle > Math.PI ) {
-    		return 2 * Math.PI - angle;
-    	}
-    	if (angle < -Math.PI) {
-    		return 2 * Math.PI + angle;
-    	}
-    	return angle;
+	    if ( angle < -Math.PI ) {
+	    	angle += 2*Math.PI; 
+	    }	    
+	    else if ( angle > Math.PI ) 
+	        angle -= 2*Math.PI; 
+	    return angle; 
+    }
+    
+    public long timePassed( long oldTime ) {
+    	return getTime() - oldTime;
     }
 }
