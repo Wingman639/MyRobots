@@ -52,7 +52,8 @@ public class GavinBot extends AdvancedRobot
     {
     	target.update(e, this);
     	lockRadarOnTarget();
-    	fireToNextTargetPosition(new Point2D.Double(target.x, target.y));
+    	//fireToNextTargetPosition(new Point2D.Double(target.x, target.y));
+    	fireToNextTargetPosition( guessPoint() );
     }
     
     public void lockRadarOnTarget() {
@@ -85,5 +86,13 @@ public class GavinBot extends AdvancedRobot
     
     public double targetMovingLength() {
     	return target.velocity * bulletFlyDurationTime( target.distance );
+    }
+    
+    public Point2D.Double guessPoint() {
+    	double xDiff, yDiff;
+    	double lengthDiff = targetMovingLength();
+    	xDiff = Math.sin(target.heading) * lengthDiff;
+    	yDiff = Math.cos(target.heading) * lengthDiff;
+    	return new Point2D.Double(target.x + xDiff, target.y + yDiff);
     }
 }
