@@ -3,58 +3,40 @@ package gavin;
 import robocode.AdvancedRobot;
 import robocode.ScannedRobotEvent;
 import robocode.HitRobotEvent;
-import static robocode.util.Utils.normalRelativeAngleDegrees;
+import gavin.Target;
+
 import java.awt.Color;
+import java.awt.geom.Point2D;
 
 public class GavinJuniorBot extends AdvancedRobot {
 
 
-	public void run() {
-		// Initialization of the robot should be put here
-		setRadarColor(new Color(200, 200, 70));
-		setScanColor(Color.blue);
+	int firepower = 1;
+	Target target = new Target();
+	
 
-		// Robot main loop
-		while(true) {
-			// Replace the next 4 lines with any behavior you would like
-			
-			double runAngle = getRunAngle();
-			
-			turnRight( runAngle / 2 );
-			setTurnRight( runAngle / 2 );
-			setAhead(200);
-			setTurnGunRight(180);
-			//scan();
-			execute();
-		}
+
+	public void run() {
+    	setAdjustGunForRobotTurn( true ); 
+        setAdjustRadarForGunTurn( true ); 
+        this.setColors(Color.blue, Color.black, Color.white, Color.white, Color.cyan);
+        
+        while (true) {
+        	if ( timePassed(target.timeStamp) > 5 ) {
+        		setTurnRadarRight(360); 
+        	}
+        	keepMoving();
+        	execute();
+        }
 	}
 
 	/**
 	 * onScannedRobot: What to do when you see another robot
 	 */
 	public void onScannedRobot(ScannedRobotEvent e) {
-		/*
-		boolean goodToFire = false;
-		double power = 1;
-		if (e.getDistance() < 300) { power = 3; }
-        if (e.getDistance() < 150) { goodToFire = true;}
-        if (e.getVelocity() < 5){ goodToFire = true;}
-        else if (getDirectionDiff(e) < 0.03) { goodToFire = true; }
-        
-        double angle = minTurnAngle( getGunAngleToTurn(e.getBearing()));
-        //double angle2 = goodToFire ? guessAdjustAngle(e) : 0;
-        turnGunLeft( angle );
-        
-        if (getGunHeat() < 0.01 && goodToFire){
-        	fire(power);
-        }
-        setTurnGunRight(-5);
-        */
-		/*double gunTurnAmt = normalRelativeAngleDegrees(e.getBearing() + (getHeading() - getRadarHeading()));
-		turnGunRight(gunTurnAmt);*/
-		fire(1);
-		//scan();
-		setTurnGunLeft(5);
+    	target.update(e, this);
+    	lockRadarOnTarget();
+    	fireToNextTargetPosition( guessPoint() );
 	}
 
 	/**
@@ -82,13 +64,14 @@ public class GavinJuniorBot extends AdvancedRobot {
 	
 	public void onHitRobot(HitRobotEvent e) {
 		stop();
+		/*
         if (isEnemy(e)) {
             //double angle = minTurnAngle(getGunAngleToTurn(e.getBearing()));
             //turnGunLeft( angle );
         	double gunTurnAmt = normalRelativeAngleDegrees(getGunHeading() - (getHeading() - e.getBearing()) );
     		turnGunRight(gunTurnAmt);
             fire(5);
-        } 
+        } */
         setTurnRight(-90);
         setBack(20);
 	}
@@ -102,21 +85,6 @@ public class GavinJuniorBot extends AdvancedRobot {
 			minAngle = minAngle + 360;
 		}
 		return minAngle;
-	}
-	
-	public double getGunAngleToTurn(double seeAngle){
-		return (seeAngle + getHeading() - getGunHeading()) % 360;
-	}
-	
-	public double getDirectionDiff(ScannedRobotEvent e){
-		double angleDelta = e.getHeading() - e.getBearing();
-		return Math.sin( angleDelta * 0.017 * (2 * 3.14/360));
-	}
-	
-	public double guessAdjustAngle(ScannedRobotEvent e){
-		double speed = e.getVelocity() * getDirectionDiff(e);
-		double angle = speed * 40;
-		return angle;
 	}
 	
 	public double toAngle(double x, double y, double fieldWidth, double fieldHeight){
@@ -147,16 +115,52 @@ public class GavinJuniorBot extends AdvancedRobot {
 		return true;
 	}
 	
-	public void targetPoint(ScannedRobotEvent e) {
-		double bearing = (getHeading() + e.getBearing()) % 360; 
-		double distance = e.getDistance(); 
-		bearing = Math.toRadians(bearing); 
 	
-		double genyX = getX() + Math.sin(bearing) * distance;
-		double genyY = getY() + Math.cos(bearing) * distance;
+	public void keepMoving() {
+		double runAngle = getRunAngle();
 		
-		out.println("genyX:"+ Math.round(genyX));
-		out.println("genyY:"+ Math.round(genyY));
-		// need structure point (x, y) to return
+		turnRight( runAngle / 2 );
+		setTurnRight( runAngle / 2 );
+		setAhead(200);
 	}
+	
+    public long timePassed( long oldTime ) {
+    	return getTime() - oldTime;
+    }
+
+    public void lockRadarOnTarget() {
+    	double angleDiff = minAngleRadians(target.direction - getRadarHeadingRadians());
+    	setTurnRadarRightRadians( angleDiff * 1.5 );
+    }
+    
+    public void fireToNextTargetPosition( Point2D.Double p) {
+    	double offset = getGunHeadingRadians() - (Math.PI/2 - Math.atan2(p.y -getY(), p.x - getX()));
+    	setTurnGunLeftRadians( minAngleRadians(offset) );
+    	setFire(firepower);
+    }
+    
+    public double minAngleRadians( double angle ) {
+	    if ( angle < -Math.PI ) {
+	    	angle += 2*Math.PI; 
+	    }	    
+	    else if ( angle > Math.PI ) 
+	        angle -= 2*Math.PI; 
+	    return angle; 
+    }
+
+    public double bulletFlyDurationTime( double distance ) {
+    	return distance / (20 -(3 * firepower));
+    }
+    
+    public double targetMovingLength() {
+    	return target.velocity * bulletFlyDurationTime( target.distance );
+    }
+    
+    public Point2D.Double guessPoint() {
+    	double xDiff, yDiff;
+    	double lengthDiff = targetMovingLength();
+    	xDiff = Math.sin(target.heading) * lengthDiff;
+    	yDiff = Math.cos(target.heading) * lengthDiff;
+    	return new Point2D.Double(target.x + xDiff, target.y + yDiff);
+    }
 }
