@@ -10,10 +10,9 @@ import java.awt.geom.Point2D;
 
 public class GavinJuniorBot extends AdvancedRobot {
 
-
 	int firepower = 1;
 	Target target = new Target();
-	
+	int moveLength = 200;
 
 
 	public void run() {
@@ -23,7 +22,7 @@ public class GavinJuniorBot extends AdvancedRobot {
         
         while (true) {
         	if ( timePassed(target.timeStamp) > 5 ) {
-        		setTurnRadarRight(360); 
+        		setTurnRadarRightRadians(Math.PI * 2); 
         	}
         	keepMoving();
         	execute();
@@ -46,19 +45,8 @@ public class GavinJuniorBot extends AdvancedRobot {
 	
 	public void onHitRobot(HitRobotEvent e) {
 		stop();
-        setTurnRight(-90);
+        setTurnRightRadians(-Math.PI/2);
         setBack(20);
-	}
-	
-	public double minTurnAngle(double angle){
-		double minAngle = angle % 360;
-		if (minAngle > 180){
-			minAngle = minAngle - 360;
-		}
-		else if( minAngle < -180){
-			minAngle = minAngle + 360;
-		}
-		return minAngle;
 	}
 	
 	public double toAngle(double x, double y, double fieldWidth, double fieldHeight){
@@ -72,30 +60,21 @@ public class GavinJuniorBot extends AdvancedRobot {
         } else if (x < fieldWidth/2 && y > fieldHeight/2) {
             angle = 135;
         } 
-        return angle;
+        return Math.toRadians(angle);
 	}
 	
 	public double getRunAngle(){
-		double runAngle = toAngle(getX(), getY(), getBattleFieldWidth(), getBattleFieldHeight()) - getHeading();
-		return minTurnAngle(runAngle);
+		double toAngleRadians = toAngle(getX(), getY(), getBattleFieldWidth(), getBattleFieldHeight());
+		double runAngle = toAngleRadians - getHeadingRadians();
+		return minAngleRadians( runAngle );
 	}
-	
-	public double getBackAngle(){
-		double runAngle = toAngle(getX(), getY(), getBattleFieldWidth(), getBattleFieldHeight()) - getHeading();
-		return runAngle;
-	}
-	
-	public boolean isEnemy(HitRobotEvent e) {
-		return true;
-	}
-	
+
 	
 	public void keepMoving() {
 		double runAngle = getRunAngle();
-		
-		turnRight( runAngle / 2 );
-		setTurnRight( runAngle / 2 );
-		setAhead(200);
+		turnRightRadians( runAngle / 2 );
+		setTurnRightRadians( runAngle / 2 );
+		setAhead(moveLength);
 	}
 	
     public long timePassed( long oldTime ) {
