@@ -16,20 +16,34 @@ public class GavinJuniorBot extends AdvancedRobot {
 
 
 	public void run() {
-    	setAdjustGunForRobotTurn( true ); 
-        setAdjustRadarForGunTurn( true ); 
-        this.setColors(Color.blue, Color.black, Color.white, Color.white, Color.cyan);
+    	initRobot();
         
         while (true) {
-        	if ( timePassed(target.timeStamp) > 5 ) {
-        		setTurnRadarRightRadians(Math.PI * 2); 
+        	if ( isTargetLost() ) {
+        		radarScanAround();
         	}
         	keepMoving();
         	execute();
         }
 	}
+	
+	private void initRobot() {
+		setAdjustGunForRobotTurn( true ); 
+        setAdjustRadarForGunTurn( true ); 
+        this.setColors(Color.gray, Color.blue, Color.yellow, Color.white, Color.cyan);
+	}
+	
+	
+	private boolean isTargetLost() {
+		return timePassed(target.timeStamp) > 5;
+	}
+	
+	
+	private void radarScanAround() {
+		setTurnRadarRightRadians(Math.PI * 2); 
+	}
 
-
+	
 	public void onScannedRobot(ScannedRobotEvent e) {
     	target.update(e, this);
     	lockRadarOnTarget();
@@ -49,7 +63,7 @@ public class GavinJuniorBot extends AdvancedRobot {
         setBack(20);
 	}
 	
-	public double toAngle(double x, double y, double fieldWidth, double fieldHeight){
+	private double toAngle(double x, double y, double fieldWidth, double fieldHeight){
 		double angle = 0;
 		if (x > fieldWidth/2 && y > fieldHeight/2) {
             angle = 225;
@@ -63,36 +77,36 @@ public class GavinJuniorBot extends AdvancedRobot {
         return Math.toRadians(angle);
 	}
 	
-	public double getRunAngle(){
+	private double getRunAngle(){
 		double toAngleRadians = toAngle(getX(), getY(), getBattleFieldWidth(), getBattleFieldHeight());
 		double runAngle = toAngleRadians - getHeadingRadians();
 		return minAngleRadians( runAngle );
 	}
 
 	
-	public void keepMoving() {
+	private void keepMoving() {
 		double runAngle = getRunAngle();
 		turnRightRadians( runAngle / 2 );
 		setTurnRightRadians( runAngle / 2 );
 		setAhead(moveLength);
 	}
 	
-    public long timePassed( long oldTime ) {
+	private long timePassed( long oldTime ) {
     	return getTime() - oldTime;
     }
 
-    public void lockRadarOnTarget() {
+	private void lockRadarOnTarget() {
     	double angleDiff = minAngleRadians(target.direction - getRadarHeadingRadians());
     	setTurnRadarRightRadians( angleDiff * 1.5 );
     }
     
-    public void fireToNextTargetPosition( Point2D.Double p) {
+    private void fireToNextTargetPosition( Point2D.Double p) {
     	double offset = getGunHeadingRadians() - (Math.PI/2 - Math.atan2(p.y -getY(), p.x - getX()));
     	setTurnGunLeftRadians( minAngleRadians(offset) );
     	setFire(firepower);
     }
     
-    public double minAngleRadians( double angle ) {
+    private double minAngleRadians( double angle ) {
 	    if ( angle < -Math.PI ) {
 	    	angle += 2*Math.PI; 
 	    }	    
@@ -101,15 +115,15 @@ public class GavinJuniorBot extends AdvancedRobot {
 	    return angle; 
     }
 
-    public double bulletFlyDurationTime( double distance ) {
+    private double bulletFlyDurationTime( double distance ) {
     	return distance / (20 -(3 * firepower));
     }
     
-    public double targetMovingLength() {
+    private double targetMovingLength() {
     	return target.velocity * bulletFlyDurationTime( target.distance );
     }
     
-    public Point2D.Double guessPoint() {
+    private Point2D.Double guessPoint() {
     	double xDiff, yDiff;
     	double lengthDiff = targetMovingLength();
     	xDiff = Math.sin(target.heading) * lengthDiff;
