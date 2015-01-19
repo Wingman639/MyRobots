@@ -1,7 +1,5 @@
 package gavin;
 
-import java.awt.geom.Point2D;
-
 import robocode.AdvancedRobot;
 import robocode.ScannedRobotEvent;
 
@@ -13,7 +11,6 @@ public class Target {
 	public double heading = 0;
 	public double direction = 0;
 	public double x = 0, y = 0;
-	public Point2D.Double p = new Point2D.Double(0, 0);
 	
 	public void update( ScannedRobotEvent e, AdvancedRobot me) {
 		timeStamp = me.getTime();

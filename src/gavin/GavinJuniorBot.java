@@ -1,12 +1,12 @@
 package gavin;
 
 import robocode.AdvancedRobot;
+import java.awt.geom.Point2D;
 import robocode.ScannedRobotEvent;
 import robocode.HitRobotEvent;
+import java.awt.Color;
 import gavin.Target;
 
-import java.awt.Color;
-import java.awt.geom.Point2D;
 
 public class GavinJuniorBot extends AdvancedRobot {
 
