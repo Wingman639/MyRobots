@@ -132,14 +132,12 @@ public class GavinJuniorBot extends AdvancedRobot {
     }*/
     
     private Point2D.Double guessPoint() {
-    	double time;
     	double nextTime;
     	Point2D.Double p;
 		p = new Point2D.Double(target.x, target.y);
 		for (int i = 0; i < 10; i++){
        		nextTime = bulletFlyDurationTime( distance(getX(), getY(), p.x, p.y) );
-			time = getTime() + nextTime;
-        	p = target.guessPosition(time);
+        	p = target.guessPosition(nextTime);
 		}
 		return p;
     }
