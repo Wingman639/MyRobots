@@ -39,8 +39,8 @@ public class Target {
 	}
 	
 	public Point2D.Double straightMovingPosition(double timeDiff) {
-		double newX = x + Math.cos(heading) * velocity * timeDiff;
-		double newY = y + Math.sin(heading) * velocity * timeDiff;
+		double newX = x + Math.sin(heading) * velocity * timeDiff;
+		double newY = y + Math.cos(heading) * velocity * timeDiff;
 		return new Point2D.Double(newX, newY);
 	}
 	
