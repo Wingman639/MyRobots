@@ -117,19 +117,7 @@ public class GavinJuniorBot extends AdvancedRobot {
     private double bulletFlyDurationTime( double distance ) {
     	return distance / (20 -(3 * firePower));
     }
-    /*
-    private double targetMovingLength() {
-    	return target.velocity * bulletFlyDurationTime( target.distance );
-    }
-    
-    
-    private Point2D.Double guessPoint() {
-    	double xDiff, yDiff;
-    	double lengthDiff = targetMovingLength();
-    	xDiff = Math.sin(target.heading) * lengthDiff;
-    	yDiff = Math.cos(target.heading) * lengthDiff;
-    	return new Point2D.Double(target.x + xDiff, target.y + yDiff);
-    }*/
+
     
     private Point2D.Double guessPoint() {
     	double nextTime;
