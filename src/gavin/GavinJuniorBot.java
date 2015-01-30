@@ -9,8 +9,8 @@ import gavin.Target;
 
 
 public class GavinJuniorBot extends AdvancedRobot {
-
-	int firepower = 1;
+	final double PI = Math.PI;
+	int firePower = 1;
 	Target target = new Target();
 	int moveLength = 200;
 
@@ -103,25 +103,25 @@ public class GavinJuniorBot extends AdvancedRobot {
     private void fireToNextTargetPosition( Point2D.Double p) {
     	double offset = getGunHeadingRadians() - (Math.PI/2 - Math.atan2(p.y -getY(), p.x - getX()));
     	setTurnGunLeftRadians( minAngleRadians(offset) );
-    	setFire(firepower);
+    	setFire(firePower);
     }
     
     private double minAngleRadians( double angle ) {
-	    if ( angle < -Math.PI ) {
-	    	angle += 2*Math.PI; 
-	    }	    
-	    else if ( angle > Math.PI ) 
-	        angle -= 2*Math.PI; 
-	    return angle; 
-    }
-
-    private double bulletFlyDurationTime( double distance ) {
-    	return distance / (20 -(3 * firepower));
+		if (angle > PI)
+			angle -= 2*PI;
+		if (angle < -PI)
+			angle += 2*PI;
+		return angle;
     }
     
+    private double bulletFlyDurationTime( double distance ) {
+    	return distance / (20 -(3 * firePower));
+    }
+    /*
     private double targetMovingLength() {
     	return target.velocity * bulletFlyDurationTime( target.distance );
     }
+    
     
     private Point2D.Double guessPoint() {
     	double xDiff, yDiff;
@@ -129,5 +129,25 @@ public class GavinJuniorBot extends AdvancedRobot {
     	xDiff = Math.sin(target.heading) * lengthDiff;
     	yDiff = Math.cos(target.heading) * lengthDiff;
     	return new Point2D.Double(target.x + xDiff, target.y + yDiff);
+    }*/
+    
+    private Point2D.Double guessPoint() {
+    	double time;
+    	double nextTime;
+    	Point2D.Double p;
+		p = new Point2D.Double(target.x, target.y);
+		for (int i = 0; i < 10; i++){
+       		nextTime = bulletFlyDurationTime( distance(getX(), getY(), p.x, p.y) );
+			time = getTime() + nextTime;
+        	p = target.guessPosition(time);
+		}
+		return p;
     }
+    
+    private double distance(double x1, double y1, double x2, double y2) {
+    	double xDiff = x2 - x1;
+    	double yDiff = y2 - y1;
+    	return Math.sqrt(xDiff * xDiff + yDiff * yDiff);
+    }
+    
 }
